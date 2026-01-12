@@ -45,18 +45,18 @@ async function addItem(item) {
 
 // POST route to add a guestbook message
 app.post('/add-item', async (req, res) => {
-    const userMessage = req.body.message;
-    const staffNumber = (req.body.staffNumber || ""); // ✅ guard
+    const fullName = req.body.fullName;
+    const staffNumber = (req.body.staffNumber || "");
 
-    if (!userMessage || userMessage.trim() === "") {
-        return res.status(400).send("Message cannot be empty");
+    if (!fullName || fullName.trim() === "") {
+    return res.status(400).send("Full name cannot be empty");
     }
 
     const newItem = {
-        id: new Date().toISOString(),
-        message: userMessage.trim(),
-        staffNumber: staffNumber.trim(), // ✅ safe now
-        _partitionKey: "guestbook"
+    id: new Date().toISOString(),
+    fullName: fullName.trim(),
+    staffNumber: staffNumber.trim(),
+    _partitionKey: "guestbook"
     };
 
     try {
@@ -88,19 +88,19 @@ app.get('/items', async (req, res) => {
 app.put('/update-item/:id', async (req, res) => {
     const id = req.params.id;
 
-    const newMessage = req.body.message;
+    const newFullName = req.body.fullName;
     const newStaffNumber = req.body.staffNumber;
 
-    if (newMessage === undefined && newStaffNumber === undefined) {
-        return res.status(400).send("Provide 'message' and/or 'staffNumber' to update");
+    if (newFullName === undefined && newStaffNumber === undefined) {
+    return res.status(400).send("Provide 'fullName' and/or 'staffNumber' to update");
     }
 
-    if (newMessage !== undefined && String(newMessage).trim() === "") {
-        return res.status(400).send("Message cannot be empty");
+    if (newFullName !== undefined && String(newFullName).trim() === "") {
+    return res.status(400).send("Full name cannot be empty");
     }
 
     if (newStaffNumber !== undefined && String(newStaffNumber).trim() === "") {
-        return res.status(400).send("Staff number cannot be empty");
+    return res.status(400).send("Staff number cannot be empty");
     }
 
     try {
@@ -109,7 +109,7 @@ app.put('/update-item/:id', async (req, res) => {
 
         const { resource: item } = await container.item(id, id).read();
 
-        if (newMessage !== undefined) item.message = String(newMessage).trim();
+        if (newFullName !== undefined) item.fullName = String(newFullName).trim();
         if (newStaffNumber !== undefined) item.staffNumber = String(newStaffNumber).trim();
 
         await container.item(id, id).replace(item);
