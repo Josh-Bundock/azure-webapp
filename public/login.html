@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="login-page">
+
+    <img
+        src="/images/Uni_of_winch_logo.jpg"
+        alt="University logo"
+        class="login-logo"
+    />
+
+  <div class="container login-container">
+    <h1>Health & Safety Login</h1>
+    <p>Please sign in to continue.</p>
+
+    <form method="POST" action="/login">
+      <div class="form-row">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" required />
+      </div>
+
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</body>
+</html>
