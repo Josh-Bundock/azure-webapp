@@ -54,66 +54,86 @@ async function loadMessages() {
         div.className = "message-item";
 
         div.innerHTML = `
-            <p><strong>Message:</strong> ${item.message}</p>
-            <p><strong>Staff #:</strong> ${item.staffNumber ?? ""}</p>
-            <button class="updateBtn" data-id="${item.id}">Update</button>
-            <button class="deleteBtn" data-id="${item.id}">Delete</button>
-            `;
-
+            <p>${item.message}</p>
+            <button class="infoBtn" data-id="${item.id}">Information</button>
+        `;
 
         container.appendChild(div);
     });
-    attachButtonEvents();
+    attachButtonEvents(items);
 }
 
 // Attach events to Update and Delete buttons
-function attachButtonEvents() {
-    document.querySelectorAll('.deleteBtn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-id');
+function attachButtonEvents(items) {
+    const modal = document.getElementById('infoModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalStaff = document.getElementById('modalStaffNumber');
 
-            await fetch(`/delete-item/${id}`, { method: 'DELETE' });
-            loadMessages();
+    const updateBtn = document.getElementById('modalUpdateBtn');
+    const deleteBtn = document.getElementById('modalDeleteBtn');
+    const closeBtn = document.getElementById('modalCloseBtn');
+
+    let currentId = null;
+
+    // Open modal when clicking "Information"
+    document.querySelectorAll('.infoBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentId = btn.getAttribute('data-id');
+
+            const item = items.find(i => i.id === currentId);
+            if (!item) return;
+
+            modalMessage.value = item.message || "";
+            modalStaff.value = item.staffNumber || "";
+
+            modal.classList.remove('hidden');
         });
     });
-    
-    document.querySelectorAll('.updateBtn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-id');
 
-        const choice = prompt(
-            "What do you want to update?\n" +
-            "1 = Message\n" +
-            "2 = Staff Number\n" +
-            "3 = Both"
-        );
+    // Close modal
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        currentId = null;
+    });
 
-        if (!choice) return;
+    // Update from modal
+    updateBtn.addEventListener('click', async () => {
+        if (!currentId) return;
 
-        const body = {};
+        const message = modalMessage.value.trim();
+        const staffNumber = modalStaff.value.trim();
 
-        if (choice === "1" || choice === "3") {
-            const newMessage = prompt("Enter new message:");
-            if (!newMessage || newMessage.trim() === "") return;
-            body.message = newMessage.trim();
+        if (!message) {
+            alert("Message cannot be empty");
+            return;
+        }
+        if (!staffNumber) {
+            alert("Staff number cannot be empty");
+            return;
         }
 
-        if (choice === "2" || choice === "3") {
-            const newStaffNumber = prompt("Enter new staff number:");
-            if (!newStaffNumber || newStaffNumber.trim() === "") return;
-            body.staffNumber = newStaffNumber.trim();
-        }
-
-        // If user typed something else, do nothing
-        if (Object.keys(body).length === 0) return;
-
-        await fetch(`/update-item/${id}`, {
+        await fetch(`/update-item/${currentId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+            body: JSON.stringify({ message, staffNumber })
         });
 
+        modal.classList.add('hidden');
+        currentId = null;
         loadMessages();
     });
-});
+
+    // Delete from modal
+    deleteBtn.addEventListener('click', async () => {
+        if (!currentId) return;
+
+        const ok = confirm("Are you sure you want to delete this item?");
+        if (!ok) return;
+
+        await fetch(`/delete-item/${currentId}`, { method: 'DELETE' });
+
+        modal.classList.add('hidden');
+        currentId = null;
+        loadMessages();
+    });
 }

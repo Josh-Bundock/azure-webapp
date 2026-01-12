@@ -7,15 +7,36 @@
     <link rel="stylesheet" href="style.css"> <!-- Link to external CSS -->
 </head>
 <body>
+  <div class="page-layout">
     <div class="container">
-        <h1>Guestbook</h1> <!-- Page heading -->
-        <p>Leave a message and it will be saved to the Cosmos DB database.</p> 
-    <input type="text" id="messageInput" placeholder="Type your message..." />
-    <input type="text" id="staffNumber" placeholder="Enter your staff number..." />
-    <button id="addItemButton">Submit</button> <!-- Button to submit message -->
+      <h1>Guestbook</h1>
+      <p>Leave a message and it will be saved to the Cosmos DB database.</p> 
+      <input type="text" id="messageInput" placeholder="Type your message..." /><br><br>
+      <input type="text" id="staffNumber" placeholder="Enter your staff number..." /><br><br>
+      <button id="addItemButton">Submit</button>
     </div>
-    <div id="messagesList" class="messages-list"></div> <!-- Section to display messages -->
-    
-    <script src="client.js"></script> 
+
+    <div id="messagesList" class="messages-list"></div>
+  </div>
+
+  <!-- Information Modal (unchanged) -->
+  <div id="infoModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Message Information</h2>
+
+      <label for="modalMessage">Message</label>
+      <input type="text" id="modalMessage" />
+
+      <label for="modalStaffNumber">Staff Number</label>
+      <input type="text" id="modalStaffNumber" />
+
+      <div class="modal-actions">
+        <button id="modalUpdateBtn">Update</button>
+        <button id="modalDeleteBtn">Delete</button>
+        <button id="modalCloseBtn" class="secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="client.js"></script>
 </body>
-</html>
