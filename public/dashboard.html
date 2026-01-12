@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health & Safety Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="dashboard">
+    <div class="dashboard-header">
+        <div class="dashboard-header-top">
+            <div>
+            <h1>Fire Warden Locations</h1>
+            <p>Live logbook view of recorded staff locations.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-controls">
+            <input id="searchInput" type="text" placeholder="Search name or staff #..." />
+            <select id="locationFilter">
+            <option value="">All locations</option>
+            </select>
+            <button id="refreshBtn">Refresh</button>
+
+            <a class="nav-btn" href="index.html">Go to Guestbook</a>
+        </div>
+        </div>
+
+
+    <div id="statsRow" class="stats-row"></div>
+    <div id="locationsGrid" class="locations-grid"></div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

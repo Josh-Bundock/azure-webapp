@@ -150,3 +150,140 @@ input[type="text"] {
 .modal-actions .secondary {
   margin-left: auto;
 }
+
+
+
+/*Dashboard CSS */
+
+.dashboard {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.dashboard-header {
+  background: white;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  margin-bottom: 16px;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dashboard-controls input,
+.dashboard-controls select {
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin: 14px 0;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+  min-width: 160px;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.stat-label {
+  opacity: 0.8;
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.location-card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+}
+
+.location-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.location-count {
+  background: #eee;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 700;
+}
+
+.warden-list {
+  display: grid;
+  gap: 10px;
+}
+
+.warden-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.warden-name {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.warden-meta {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+.nav-btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #eee;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid #bbb;
+}
+
+.nav-btn:hover {
+  background: #e3e3e3;
+}
+
+.dashboard-header-top {
+  display: flex;
+  justify-content: space-between; /* 👈 pushes button right */
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-controls .nav-btn {
+  margin-left: auto; /* ✅ pushes the button to the far right */
+}

@@ -1,45 +1,63 @@
 // Wait for the Document Object Model (DOM) to fully load
 document.addEventListener('DOMContentLoaded', () => {
     // Get references to HTML elements
-    const button = document.getElementById('addItemButton'); // The "Submit" button
-    const input = document.getElementById('fullNameInput'); // The text field
-    const staffInput = document.getElementById('staffNumber'); // NEW
+    const button = document.getElementById('addItemButton');
+    const input = document.getElementById('fullNameInput');
+    const staffInput = document.getElementById('staffNumber');
+    const locationInput = document.getElementById('location');
 
-    
     // Add click event listener to the button
     button.addEventListener('click', async () => {
-        // Get the value typed by the user
-        const fullName = input.value.trim(); // Remove extra spaces
-        const staffNumber = staffInput.value.trim(); // NEW
-        
+        const fullName = input.value.trim();
+        const staffNumber = staffInput.value.trim();
+        const location = locationInput.value;
+
         // Validate input
         if (!fullName) {
-            alert("Please enter a message before submitting.");
-            return; // Stop if empty
+            alert("Please enter a full name before submitting.");
+            return;
+        }
+        if (!staffNumber) {
+            alert("Please enter a staff number before submitting.");
+            return;
         }
 
-        // Send message to server via fetch
+        // Send data to server
         try {
             const response = await fetch('/add-item', {
-                method: 'POST', // POST request
-                headers: { 'Content-Type': 'application/json' }, // Send JSON
-                body: JSON.stringify({ fullName, staffNumber }) // Wrap message in JSON
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullName, staffNumber, location })
             });
-            // Handle server response
+
             if (response.ok) {
-                alert('Message added successfully!');
-                input.value = ""; // Clear input after success
+                alert('Item added successfully!');
+
+                // Clear inputs
+                input.value = "";
+                staffInput.value = "";
+                locationInput.selectedIndex = 0;
+
+                // Refresh list immediately
+                await loadMessages();
             } else {
-                alert('Error adding message');
+                alert(await response.text());
             }
         } catch (error) {
-        console.error(error);
-        alert('Error adding message');
+            console.error(error);
+            alert('Error adding item');
         }
     });
-    loadMessages(); // Load messages when the web page opens
+
+    // Load messages when the web page opens
+    loadMessages();
 });
 
+// Format ISO date string into readable local date/time
+function formatDateTime(isoString) {
+    if (!isoString) return "";
+    return new Date(isoString).toLocaleString();
+}
 
 // Fetch and render all messages in the list
 async function loadMessages() {
@@ -53,21 +71,33 @@ async function loadMessages() {
         const div = document.createElement('div');
         div.className = "message-item";
 
+        const createdText = formatDateTime(item.createdAt);
+
         div.innerHTML = `
-            <p>${item.fullName}</p>
+            <div>
+                <p>${item.fullName}</p>
+                <small>${createdText}</small>
+            </div>
             <button class="infoBtn" data-id="${item.id}">Information</button>
         `;
 
         container.appendChild(div);
     });
+
     attachButtonEvents(items);
 }
 
-// Attach events to Update and Delete buttons
+// Attach events to Information button + modal buttons
 function attachButtonEvents(items) {
     const modal = document.getElementById('infoModal');
     const modalFullName = document.getElementById('modalFullName');
     const modalStaff = document.getElementById('modalStaffNumber');
+    const modalLocation = document.getElementById('modalLocation');
+
+    // If you added a createdAt display in the modal like:
+    // <span id="modalCreatedAt"></span>
+    // then uncomment the next line and also set it below.
+    const modalCreatedAt = document.getElementById('modalCreatedAt');
 
     const updateBtn = document.getElementById('modalUpdateBtn');
     const deleteBtn = document.getElementById('modalDeleteBtn');
@@ -85,6 +115,12 @@ function attachButtonEvents(items) {
 
             modalFullName.value = item.fullName || "";
             modalStaff.value = item.staffNumber || "";
+            modalLocation.value = item.location || "Alwyn Hall";
+
+            // Show created time in the modal (only if the element exists)
+            if (modalCreatedAt) {
+                modalCreatedAt.textContent = formatDateTime(item.createdAt) || "—";
+            }
 
             modal.classList.remove('hidden');
         });
@@ -102,9 +138,10 @@ function attachButtonEvents(items) {
 
         const fullName = modalFullName.value.trim();
         const staffNumber = modalStaff.value.trim();
+        const location = modalLocation.value;
 
         if (!fullName) {
-            alert("Message cannot be empty");
+            alert("Full name cannot be empty");
             return;
         }
         if (!staffNumber) {
@@ -115,7 +152,7 @@ function attachButtonEvents(items) {
         await fetch(`/update-item/${currentId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fullName, staffNumber })
+            body: JSON.stringify({ fullName, staffNumber, location })
         });
 
         modal.classList.add('hidden');

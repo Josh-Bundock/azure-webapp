@@ -47,6 +47,7 @@ async function addItem(item) {
 app.post('/add-item', async (req, res) => {
     const fullName = req.body.fullName;
     const staffNumber = (req.body.staffNumber || "");
+    const location = (req.body.location || "");
 
     if (!fullName || fullName.trim() === "") {
     return res.status(400).send("Full name cannot be empty");
@@ -56,6 +57,8 @@ app.post('/add-item', async (req, res) => {
     id: new Date().toISOString(),
     fullName: fullName.trim(),
     staffNumber: staffNumber.trim(),
+    location: location.trim(),
+    createdAt: new Date().toISOString(),   // ✅ add this
     _partitionKey: "guestbook"
     };
 
@@ -90,9 +93,10 @@ app.put('/update-item/:id', async (req, res) => {
 
     const newFullName = req.body.fullName;
     const newStaffNumber = req.body.staffNumber;
+    const newLocation = req.body.location;
 
-    if (newFullName === undefined && newStaffNumber === undefined) {
-    return res.status(400).send("Provide 'fullName' and/or 'staffNumber' to update");
+    if (newFullName === undefined && newStaffNumber === undefined && newLocation === undefined) {
+    return res.status(400).send("Provide 'fullName' and/or 'staffNumber' and/or 'location' to update");
     }
 
     if (newFullName !== undefined && String(newFullName).trim() === "") {
@@ -111,6 +115,7 @@ app.put('/update-item/:id', async (req, res) => {
 
         if (newFullName !== undefined) item.fullName = String(newFullName).trim();
         if (newStaffNumber !== undefined) item.staffNumber = String(newStaffNumber).trim();
+        if (newLocation !== undefined) item.location = String(newLocation).trim();
 
         await container.item(id, id).replace(item);
         res.sendStatus(200);
