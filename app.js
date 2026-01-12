@@ -8,8 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Cosmos DB connection details
-const endpoint = process.env.COSMOS_URI;
-const key = process.env.COSMOS_PRIMARY_KEY;
+const endpoint = "https://dftc-cosmosdb.documents.azure.com:443/";
 const client = new CosmosClient({ endpoint, key });
 
 // Your chosen database and container names
@@ -46,7 +45,8 @@ async function addItem(item) {
 // POST route to add a guestbook message
 app.post('/add-item', async (req, res) => {
     const userMessage = req.body.message;
-    
+    const staffNumber = req.body.staffNumber;
+
     if (!userMessage || userMessage.trim() === "") {
         return res.status(400).send("Message cannot be empty");
     }
@@ -55,6 +55,7 @@ app.post('/add-item', async (req, res) => {
     const newItem = {
         id: new Date().toISOString(),
         message: userMessage.trim(),
+        staffNumber: staffNumber.trim(),
         _partitionKey: "guestbook"
     };
 
@@ -82,19 +83,39 @@ app.get('/items', async (req, res) => {
     }
 });
 
-// UPDATE an item by ID
+// UPDATE an item by ID (message and/or staffNumber)
 app.put('/update-item/:id', async (req, res) => {
     const id = req.params.id;
-    const newMessage = req.body.message;
 
-    if (!newMessage) return res.status(400).send("Message cannot be empty");
-    
+    // Pull both fields (either can be missing)
+    const newMessage = req.body.message;
+    const newStaffNumber = req.body.staffNumber;
+
+    // Must provide at least one field to update
+    if (newMessage === undefined && newStaffNumber === undefined) {
+        return res.status(400).send("Provide 'message' and/or 'staffNumber' to update");
+    }
+
+    // If message is provided, it can't be empty
+    if (newMessage !== undefined && String(newMessage).trim() === "") {
+        return res.status(400).send("Message cannot be empty");
+    }
+
+    // If staffNumber is provided, it can't be empty
+    if (newStaffNumber !== undefined && String(newStaffNumber).trim() === "") {
+        return res.status(400).send("Staff number cannot be empty");
+    }
+
     try {
         const { database } = await client.databases.createIfNotExists({ id: databaseId });
         const { container } = await database.containers.createIfNotExists({ id: containerId });
 
+        // Read existing item
         const { resource: item } = await container.item(id, id).read();
-        item.message = newMessage;
+
+        // Only update fields that were provided
+        if (newMessage !== undefined) item.message = String(newMessage).trim();
+        if (newStaffNumber !== undefined) item.staffNumber = String(newStaffNumber).trim();
 
         await container.item(id, id).replace(item);
         res.sendStatus(200);
@@ -103,6 +124,7 @@ app.put('/update-item/:id', async (req, res) => {
         res.sendStatus(500);
     }
 });
+
 
 // DELETE an item by ID
 app.delete('/delete-item/:id', async (req, res) => {
