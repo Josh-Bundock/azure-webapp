@@ -11,7 +11,7 @@
     <div class="container">
       <h1>Guestbook</h1>
       <p>Leave a message and it will be saved to the Cosmos DB database.</p> 
-      <input type="text" id="messageInput" placeholder="Type your message..." /><br><br>
+      <input type="text" id="fullNameInput" placeholder="Enter staff full name..." /><br><br>
       <input type="text" id="staffNumber" placeholder="Enter your staff number..." /><br><br>
       <button id="addItemButton">Submit</button>
     </div>
@@ -22,10 +22,10 @@
   <!-- Information Modal (unchanged) -->
   <div id="infoModal" class="modal hidden">
     <div class="modal-content">
-      <h2>Message Information</h2>
+      <h2>Staff Information</h2>
 
-      <label for="modalMessage">Message</label>
-      <input type="text" id="modalMessage" />
+    <label for="modalFullName">Full Name</label>
+    <input type="text" id="modalFullName" />
 
       <label for="modalStaffNumber">Staff Number</label>
       <input type="text" id="modalStaffNumber" />

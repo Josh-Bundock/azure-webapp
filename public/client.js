@@ -2,18 +2,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Get references to HTML elements
     const button = document.getElementById('addItemButton'); // The "Submit" button
-    const input = document.getElementById('messageInput'); // The text field
+    const input = document.getElementById('fullNameInput'); // The text field
     const staffInput = document.getElementById('staffNumber'); // NEW
 
     
     // Add click event listener to the button
     button.addEventListener('click', async () => {
         // Get the value typed by the user
-        const message = input.value.trim(); // Remove extra spaces
+        const fullName = input.value.trim(); // Remove extra spaces
         const staffNumber = staffInput.value.trim(); // NEW
         
         // Validate input
-        if (!message) {
+        if (!fullName) {
             alert("Please enter a message before submitting.");
             return; // Stop if empty
         }
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/add-item', {
                 method: 'POST', // POST request
                 headers: { 'Content-Type': 'application/json' }, // Send JSON
-                body: JSON.stringify({ message, staffNumber }) // Wrap message in JSON
+                body: JSON.stringify({ fullName, staffNumber }) // Wrap message in JSON
             });
             // Handle server response
             if (response.ok) {
@@ -54,7 +54,7 @@ async function loadMessages() {
         div.className = "message-item";
 
         div.innerHTML = `
-            <p>${item.message}</p>
+            <p>${item.fullName}</p>
             <button class="infoBtn" data-id="${item.id}">Information</button>
         `;
 
@@ -66,7 +66,7 @@ async function loadMessages() {
 // Attach events to Update and Delete buttons
 function attachButtonEvents(items) {
     const modal = document.getElementById('infoModal');
-    const modalMessage = document.getElementById('modalMessage');
+    const modalFullName = document.getElementById('modalFullName');
     const modalStaff = document.getElementById('modalStaffNumber');
 
     const updateBtn = document.getElementById('modalUpdateBtn');
@@ -83,7 +83,7 @@ function attachButtonEvents(items) {
             const item = items.find(i => i.id === currentId);
             if (!item) return;
 
-            modalMessage.value = item.message || "";
+            modalFullName.value = item.fullName || "";
             modalStaff.value = item.staffNumber || "";
 
             modal.classList.remove('hidden');
@@ -100,10 +100,10 @@ function attachButtonEvents(items) {
     updateBtn.addEventListener('click', async () => {
         if (!currentId) return;
 
-        const message = modalMessage.value.trim();
+        const fullName = modalFullName.value.trim();
         const staffNumber = modalStaff.value.trim();
 
-        if (!message) {
+        if (!fullName) {
             alert("Message cannot be empty");
             return;
         }
@@ -115,7 +115,7 @@ function attachButtonEvents(items) {
         await fetch(`/update-item/${currentId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, staffNumber })
+            body: JSON.stringify({ fullName, staffNumber })
         });
 
         modal.classList.add('hidden');
