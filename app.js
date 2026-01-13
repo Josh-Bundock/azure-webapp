@@ -116,24 +116,47 @@ app.post('/add-item', requireAuth, async (req, res) => {
   if (!fullName || fullName.trim() === "") {
     return res.status(400).send("Full name cannot be empty");
   }
-
-  const newItem = {
-    id: new Date().toISOString(),
-    fullName: fullName.trim(),
-    staffNumber: staffNumber.trim(),
-    location: location.trim(),
-    createdAt: new Date().toISOString(), // automatic timestamp
-    _partitionKey: "guestbook"
-  };
+  if (!staffNumber || staffNumber.trim() === "") {
+    return res.status(400).send("Staff number cannot be empty");
+  }
 
   try {
-    await addItem(newItem);
-    res.sendStatus(200);
+    const { database } = await client.databases.createIfNotExists({ id: databaseId });
+    const { container } = await database.containers.createIfNotExists({ id: containerId });
+
+    // ✅ Check if staff number is already in use
+    const querySpec = {
+      query: "SELECT TOP 1 c.fullName FROM c WHERE c.staffNumber = @staffNumber",
+      parameters: [{ name: "@staffNumber", value: staffNumber.trim() }]
+    };
+
+    const { resources: existing } = await container.items.query(querySpec).fetchAll();
+
+    if (existing.length > 0) {
+        const existingName = existing[0].fullName || "someone";
+        return res
+            .status(409)
+            .send(`Staff number ${staffNumber.trim()} is already in use by ${existingName}.`);
+        }
+
+    const newItem = {
+      id: new Date().toISOString(),
+      fullName: fullName.trim(),
+      staffNumber: staffNumber.trim(),
+      location: location.trim(),
+      createdAt: new Date().toISOString(),
+      _partitionKey: "guestbook"
+    };
+
+    await container.items.create(newItem);
+    return res.sendStatus(200);
+
   } catch (error) {
     console.error("Error adding item to Cosmos DB:", error);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 });
+
 
 // Read all records
 app.get('/items', requireAuth, async (req, res) => {
